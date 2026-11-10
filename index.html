@@ -1,0 +1,1102 @@
+```html
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Tajwid: Hukum Nun Mati & Tanwin</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Amiri for Arabic typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                        amber: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Amiri', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .arabic-text { font-family: 'Amiri', serif; direction: rtl; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-900 via-emerald-800 to-slate-900 text-slate-100 min-h-full flex flex-col antialiased selection:bg-amber-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="bg-emerald-950/80 backdrop-blur border-b border-emerald-700/40 sticky top-0 z-50 px-4 py-3 shadow-lg">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.returnToDashboard()">
+                <div class="bg-amber-500 text-emerald-950 p-2 rounded-xl shadow-md font-bold text-lg flex items-center justify-center w-10 h-10">
+                    📖
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg sm:text-xl tracking-tight text-emerald-100">Kuis Tajwid Pro</h1>
+                    <p class="text-xs text-emerald-300/80">Hukum Nun Mati & Tanwin (56 Soal)</p>
+                </div>
+            </div>
+            <div id="header-stats" class="hidden sm:flex items-center space-x-4 text-sm bg-emerald-900/60 px-3 py-1.5 rounded-full border border-emerald-700/30">
+                <span id="stat-current-chapter" class="font-medium text-amber-400">Menu Utama</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-3xl w-full mx-auto px-4 py-6 sm:py-10 flex flex-col justify-center">
+
+        <!-- VIEW: DASHBOARD -->
+        <div id="view-dashboard" class="space-y-6 animate-fadeIn">
+            <div class="bg-emerald-900/40 border border-emerald-600/30 rounded-3xl p-6 sm:p-8 shadow-xl backdrop-blur-md text-center relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <span class="inline-block bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-semibold mb-3 tracking-wide uppercase">Pembelajaran Interaktif Al-Qur'an</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">Uji Pemahaman Hukum Tajwid Anda</h2>
+                <p class="text-emerald-200/90 text-sm sm:text-base max-w-xl mx-auto mb-6 leading-relaxed">
+                    Pilih bab di bawah ini untuk memulai latihan soal berbasis ayat suci Al-Qur'an secara terstruktur. Terdapat 5 bab dengan total 56 contoh soal lengkap beserta pembahasannya.
+                </p>
+                <div id="overall-progress-bar" class="hidden bg-emerald-950 p-4 rounded-2xl border border-emerald-700/40 max-w-md mx-auto mb-2">
+                    <div class="flex justify-between text-xs text-emerald-300 mb-1 font-medium">
+                        <span>Progress Keseluruhan</span>
+                        <span id="progress-percentage">0% Selesai</span>
+                    </div>
+                    <div class="w-full bg-emerald-950 rounded-full h-2.5 overflow-hidden border border-emerald-700/50">
+                        <div id="progress-fill" class="bg-gradient-to-r from-amber-500 to-amber-400 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter List -->
+            <div class="space-y-3.5" id="chapter-list-container">
+                <!-- Rendered dynamically by JS -->
+            </div>
+
+            <!-- Global Action (if finished) -->
+            <div id="global-recap-btn-container" class="hidden text-center pt-2">
+                <button onclick="app.showGlobalRecap()" class="bg-gradient-to-r from-amber-500 to-amber-600 text-emerald-950 font-bold px-6 py-3 rounded-2xl shadow-lg hover:from-amber-400 hover:to-amber-500 transition-all transform hover:-translate-y-0.5">
+                    🏆 Lihat Rekapitulasi Nilai Keseluruhan (56 Soal)
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW: QUIZ -->
+        <div id="view-quiz" class="hidden space-y-5 animate-fadeIn">
+            <!-- Quiz Top Bar -->
+            <div class="flex items-center justify-between bg-emerald-900/50 border border-emerald-700/40 p-4 rounded-2xl backdrop-blur">
+                <button onclick="app.returnToDashboard()" class="text-xs bg-emerald-800/80 hover:bg-emerald-700 px-3 py-1.5 rounded-xl transition text-emerald-200 flex items-center space-x-1">
+                    <span>←</span> <span>Menu Utama</span>
+                </button>
+                <div class="text-xs sm:text-sm font-semibold text-amber-300" id="quiz-chapter-title">Bab 1</div>
+                <div class="text-xs bg-emerald-950 px-3 py-1 rounded-xl border border-emerald-800 text-emerald-300 font-medium">
+                    Soal <span id="current-question-num">1</span> / <span id="total-question-num">12</span>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-emerald-900/40 border border-emerald-700/40 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-md space-y-6 relative">
+                <!-- Question Metadata -->
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-700/30 pb-4">
+                    <span id="question-type-badge" class="text-xs bg-emerald-800/70 text-emerald-200 px-3 py-1 rounded-lg font-medium border border-emerald-600/30">Nun Mati (نْ)</span>
+                    <span id="question-source-badge" class="text-xs text-amber-400/90 font-medium bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20">QS. Al-Baqarah (2): 62</span>
+                </div>
+
+                <!-- Arabic Prompt -->
+                <div class="text-center py-6 bg-emerald-950/60 rounded-2xl border border-emerald-700/30 px-4 shadow-inner">
+                    <p class="text-xs text-emerald-300/80 mb-2 font-medium">Lafadz Kunci Tajwid:</p>
+                    <div id="question-arabic-text" class="arabic-text text-4xl sm:text-5xl text-amber-300 font-bold tracking-wide py-2">
+                        مَنْ آمَنَ
+                    </div>
+                </div>
+
+                <p class="text-sm sm:text-base font-medium text-emerald-100 text-center" id="question-prompt-text">
+                    Bagaimana hukum bacaan tajwid pada lafadz di atas?
+                </p>
+
+                <!-- Options Grid -->
+                <div class="grid grid-cols-1 gap-3 pt-2" id="options-container">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <!-- Explanation Box (Hidden until answered) -->
+                <div id="explanation-box" class="hidden mt-4 p-4 rounded-2xl border transition-all duration-300 animate-fadeIn">
+                    <div class="flex items-center space-x-2 font-bold mb-1" id="explanation-header">
+                        <span id="feedback-icon">✅</span>
+                        <span id="feedback-title" class="text-base">Benar!</span>
+                    </div>
+                    <p class="text-sm text-emerald-100/90 leading-relaxed" id="explanation-text">
+                        Penjelasan detail tajwid di sini...
+                    </p>
+                    <div class="mt-4 text-right">
+                        <button onclick="app.nextQuestion()" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold px-6 py-2.5 rounded-xl shadow transition text-sm">
+                            Lanjut ke Soal Berikutnya →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: CHAPTER RESULT -->
+        <div id="view-result" class="hidden space-y-6 animate-fadeIn">
+            <div class="bg-emerald-900/40 border border-emerald-700/40 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-md text-center space-y-6">
+                <div class="w-20 h-20 bg-amber-500/20 border-2 border-amber-500/50 rounded-full flex items-center justify-center mx-auto text-4xl shadow-lg">
+                    🌟
+                </div>
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2" id="result-chapter-title">Bab Selesai!</h2>
+                    <p class="text-emerald-200 text-sm">Alhamdulillah, Anda telah menyelesaikan seluruh soal pada bab ini.</p>
+                </div>
+
+                <!-- Score Stats Card -->
+                <div class="grid grid-cols-3 gap-3 max-w-md mx-auto bg-emerald-950/60 p-4 rounded-2xl border border-emerald-700/40">
+                    <div class="text-center">
+                        <div class="text-xs text-emerald-300 mb-1">Skor</div>
+                        <div class="text-2xl font-bold text-amber-400" id="stat-score">100</div>
+                    </div>
+                    <div class="text-center border-x border-emerald-800">
+                        <div class="text-xs text-emerald-300 mb-1">Benar</div>
+                        <div class="text-2xl font-bold text-emerald-400" id="stat-correct">12</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-emerald-300 mb-1">Salah</div>
+                        <div class="text-2xl font-bold text-rose-400" id="stat-wrong">0</div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+                    <button onclick="app.retryChapter()" class="w-full sm:w-auto bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-semibold px-6 py-3 rounded-xl border border-emerald-600/40 transition text-sm">
+                        🔄 Ulangi Bab Ini
+                    </button>
+                    <button id="btn-next-chapter" onclick="app.nextChapterOrDashboard()" class="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold px-6 py-3 rounded-xl shadow-lg transition text-sm">
+                        Lanjut ke Bab Berikutnya →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: GLOBAL RECAP -->
+        <div id="view-global-recap" class="hidden space-y-6 animate-fadeIn">
+            <div class="bg-emerald-900/40 border border-emerald-700/40 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-md space-y-6">
+                <div class="text-center">
+                    <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-semibold mb-2 inline-block">Rekapitulasi Akhir</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Hasil Keseluruhan Kuis Tajwid</h2>
+                    <p class="text-emerald-200 text-sm mt-1">Evaluasi lengkap dari 5 Bab dan 56 Soal</p>
+                </div>
+
+                <div class="bg-emerald-950/70 border border-emerald-700/40 p-6 rounded-2xl text-center space-y-2">
+                    <div class="text-sm text-emerald-300 font-medium">Total Skor Akhir Anda</div>
+                    <div class="text-5xl font-extrabold text-amber-400 tracking-tight" id="global-final-score">0 / 56</div>
+                    <p class="text-xs text-emerald-300/80 pt-1" id="global-score-percentage">Persentase: 0%</p>
+                </div>
+
+                <!-- Per Chapter Summary -->
+                <div class="space-y-3" id="global-chapter-breakdown">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                    <button onclick="app.resetAllProgress()" class="w-full sm:w-auto bg-rose-900/40 hover:bg-rose-900/60 text-rose-200 border border-rose-700/50 font-semibold px-6 py-3 rounded-xl transition text-sm">
+                        🗑️ Reset Semua Progress
+                    </button>
+                    <button onclick="app.returnToDashboard()" class="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold px-6 py-3 rounded-xl shadow-lg transition text-sm">
+                        🏠 Kembali ke Menu Utama
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-xs text-emerald-300/60 border-t border-emerald-800/40 mt-auto">
+        <p>Kuis Interaktif Tajwid • Berdasarkan Materi Hukum Nun Mati & Tanwin Al-Qur'an</p>
+    </footer>
+
+    <!-- Application Script -->
+    <script>
+        // Complete 56 Questions Dataset extracted precisely from user discussion
+        const chaptersData = [
+            {
+                id: 1,
+                title: "Bab 1: Izhar Halqi (إظهار حلقي)",
+                desc: "Membaca nun mati atau tanwin dengan jelas tanpa mendengung ketika bertemu 6 huruf tenggorokan (ء, ه, ح, خ, ع, غ).",
+                questions: [
+                    {
+                        arabic: "مَنْ آمَنَ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Baqarah (2): 62",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مَنْ آمَنَ'?",
+                        options: ["Izhar Halqi", "Idgham Bighunnah", "Iqlab", "Ikhfa Haqiqi"],
+                        correct: 0,
+                        explanation: "Izhar Halqi. Nun mati (نْ) bertemu dengan huruf Hamzah (ء) yang merupakan huruf halqi (tenggorokan), sehingga dibaca jelas tanpa dengung."
+                    },
+                    {
+                        arabic: "كُلٌّ آمَنَ",
+                        type: "Tanwin (ٌ)",
+                        source: "QS. Al-Baqarah (2): 285",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'كُلٌّ آمَنَ'?",
+                        options: ["Idgham Bilaghunnah", "Izhar Halqi", "Ikhfa Haqiqi", "Idgham Bighunnah"],
+                        correct: 1,
+                        explanation: "Izhar Halqi. Tanwin dhammatain (ٌ) bertemu dengan huruf Hamzah (ء), dibaca jelas tanpa dengung."
+                    },
+                    {
+                        arabic: "مَنْ هَاجَرَ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. An-Nisa (4): 100",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مَنْ هَاجَرَ'?",
+                        options: ["Iqlab", "Idgham Bighunnah", "Izhar Halqi", "Ikhfa Haqiqi"],
+                        correct: 2,
+                        explanation: "Izhar Halqi. Nun mati (نْ) bertemu dengan huruf Ha (ه), dibaca jelas."
+                    },
+                    {
+                        arabic: "فَرِيقًا هَدَىٰ",
+                        type: "Tanwin (ً)",
+                        source: "QS. Al-A'raf (7): 30",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'فَرِيقًا هَدَىٰ'?",
+                        options: ["Izhar Halqi", "Idgham Bilaghunnah", "Iqlab", "Idgham Bighunnah"],
+                        correct: 0,
+                        explanation: "Izhar Halqi. Tanwin fathatain (ً) bertemu dengan huruf Ha (ه), dibaca jelas."
+                    },
+                    {
+                        arabic: "مِنْ حَكِيمٍ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Fushshilat (41): 42",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ حَكِيمٍ'?",
+                        options: ["Ikhfa Haqiqi", "Idgham Bighunnah", "Izhar Halqi", "Iqlab"],
+                        correct: 2,
+                        explanation: "Izhar Halqi. Nun mati (نْ) bertemu dengan huruf Ha' (ح), dibaca jelas."
+                    },
+                    {
+                        arabic: "عَلِيمٌ حَكِيمٌ",
+                        type: "Tanwin (ٌ)",
+                        source: "QS. Yusuf (12): 100",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'عَلِيمٌ حَكِيمٌ'?",
+                        options: ["Izhar Halqi", "Idgham Bilaghunnah", "Idgham Bighunnah", "Ikhfa Haqiqi"],
+                        correct: 0,
+                        explanation: "Izhar Halqi. Tanwin dhammatain (ٌ) bertemu dengan huruf Ha' (ح), dibaca jelas."
+                    },
+                    {
+                        arabic: "مَنْ خَافَ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Ar-Rahman (55): 46",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مَنْ خَافَ'?",
+                        options: ["Iqlab", "Izhar Halqi", "Idgham Bighunnah", "Ikhfa Haqiqi"],
+                        correct: 1,
+                        explanation: "Izhar Halqi. Nun mati (نْ) bertemu dengan huruf Kha' (خ), dibaca jelas."
+                    },
+                    {
+                        arabic: "يَوْمَئِذٍ خَاشِعَةٌ",
+                        type: "Tanwin (ٍ)",
+                        source: "QS. Al-Ghasyiyah (88): 2",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'يَوْمَئِذٍ خَاشِعَةٌ'?",
+                        options: ["Idgham Bighunnah", "Ikhfa Haqiqi", "Idgham Bilaghunnah", "Izhar Halqi"],
+                        correct: 3,
+                        explanation: "Izhar Halqi. Tanwin kasratain (ٍ) bertemu dengan huruf Kha' (خ), dibaca jelas."
+                    },
+                    {
+                        arabic: "مَنْ عَمِلَ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. An-Nahl (16): 97",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مَنْ عَمِلَ'?",
+                        options: ["Izhar Halqi", "Iqlab", "Idgham Bilaghunnah", "Ikhfa Haqiqi"],
+                        correct: 0,
+                        explanation: "Izhar Halqi. Nun mati (نْ) bertemu dengan huruf Ain (ع), dibaca jelas."
+                    },
+                    {
+                        arabic: "سَمِيعٌ عَلِيمٌ",
+                        type: "Tanwin (ٌ)",
+                        source: "QS. Al-Baqarah (2): 227",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'سَمِيعٌ عَلِيمٌ'?",
+                        options: ["Idgham Bighunnah", "Izhar Halqi", "Ikhfa Haqiqi", "Iqlab"],
+                        correct: 1,
+                        explanation: "Izhar Halqi. Tanwin dhammatain (ٌ) bertemu dengan huruf Ain (ع), dibaca jelas."
+                    },
+                    {
+                        arabic: "مِنْ غِلٍّ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Hijr (15): 47",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ غِلٍّ'?",
+                        options: ["Idgham Bighunnah", "Iqlab", "Izhar Halqi", "Ikhfa Haqiqi"],
+                        correct: 2,
+                        explanation: "Izhar Halqi. Nun mati (نْ) bertemu dengan huruf Gha'in (غ), dibaca jelas."
+                    },
+                    {
+                        arabic: "عَفُوٌّ غَفُورٌ",
+                        type: "Tanwin (ٌ)",
+                        source: "QS. Al-Hajj (22): 60",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'عَفُوٌّ غَفُورٌ'?",
+                        options: ["Izhar Halqi", "Idgham Bilaghunnah", "Idgham Bighunnah", "Ikhfa Haqiqi"],
+                        correct: 0,
+                        explanation: "Izhar Halqi. Tanwin dhammatain (ٌ) bertemu dengan huruf Gha'in (غ), dibaca jelas."
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Bab 2: Idgham Bighunnah (إدغام بغنة)",
+                desc: "Memasukkan suara nun mati atau tanwin ke huruf berikutnya disertai dengung 2 harakat (huruf: ي, ن, م, و).",
+                questions: [
+                    {
+                        arabic: "مَنْ يَعْمَلْ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Az-Zalzalah (99): 7",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مَنْ يَعْمَلْ'?",
+                        options: ["Izhar Halqi", "Idgham Bighunnah", "Iqlab", "Idgham Bilaghunnah"],
+                        correct: 1,
+                        explanation: "Idgham Bighunnah. Nun mati (نْ) bertemu huruf Ya' (ي), dilebur disertai dengung 2 harakat."
+                    },
+                    {
+                        arabic: "يَوْمَئِذٍ يَصْدُرُ",
+                        type: "Tanwin (ٍ)",
+                        source: "QS. Az-Zalzalah (99): 6",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'يَوْمَئِذٍ يَصْدُرُ'?",
+                        options: ["Idgham Bilaghunnah", "Ikhfa Haqiqi", "Idgham Bighunnah", "Izhar Halqi"],
+                        correct: 2,
+                        explanation: "Idgham Bighunnah. Tanwin kasratain (ٍ) bertemu huruf Ya' (ي), dilebur dengan dengung."
+                    },
+                    {
+                        arabic: "مِنْ نِعْمَةٍ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. An-Nahl (16): 53",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ نِعْمَةٍ'?",
+                        options: ["Idgham Bighunnah", "Izhar Halqi", "Iqlab", "Ikhfa Haqiqi"],
+                        correct: 0,
+                        explanation: "Idgham Bighunnah. Nun mati (نْ) bertemu huruf Nun (ن), dilebur disertai dengung."
+                    },
+                    {
+                        arabic: "يَوْمَئِذٍ نَاعِمَةٌ",
+                        type: "Tanwin (ٍ)",
+                        source: "QS. Al-Ghasyiyah (88): 8",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'يَوْمَئِذٍ نَاعِمَةٌ'?",
+                        options: ["Idgham Bilaghunnah", "Izhar Halqi", "Idgham Bighunnah", "Iqlab"],
+                        correct: 2,
+                        explanation: "Idgham Bighunnah. Tanwin kasratain (ٍ) bertemu huruf Nun (ن), dilebur disertai dengung."
+                    },
+                    {
+                        arabic: "مِنْ مَسَدٍ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Lahab (111): 5",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ مَسَدٍ'?",
+                        options: ["Ikhfa Haqiqi", "Idgham Bighunnah", "Izhar Halqi", "Idgham Bilaghunnah"],
+                        correct: 1,
+                        explanation: "Idgham Bighunnah. Nun mati (نْ) bertemu huruf Mim (م), dilebur disertai dengung."
+                    },
+                    {
+                        arabic: "عَذَابٌ مُهِينٌ",
+                        type: "Tanwin (ٌ)",
+                        source: "QS. Al-Baqarah (2): 90",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'عَذَابٌ مُهِينٌ'?",
+                        options: ["Izhar Halqi", "Idgham Bighunnah", "Iqlab", "Ikhfa Haqiqi"],
+                        correct: 1,
+                        explanation: "Idgham Bighunnah. Tanwin dhammatain (ٌ) bertemu huruf Mim (م), dilebur disertai dengung."
+                    },
+                    {
+                        arabic: "مِنْ وَرَائِهِمْ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Buruj (85): 20",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ وَرَائِهِمْ'?",
+                        options: ["Izhar Halqi", "Idgham Bilaghunnah", "Idgham Bighunnah", "Iqlab"],
+                        correct: 2,
+                        explanation: "Idgham Bighunnah. Nun mati (نْ) bertemu huruf Wawu (و), dilebur disertai dengung."
+                    },
+                    {
+                        arabic: "وَلِيٍّ وَلَا نَصِيرٍ",
+                        type: "Tanwin (ٍ)",
+                        source: "QS. Al-Baqarah (2): 107",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'وَلِيٍّ وَلَا نَصِيرٍ'?",
+                        options: ["Idgham Bighunnah", "Izhar Halqi", "Idgham Bilaghunnah", "Ikhfa Haqiqi"],
+                        correct: 0,
+                        explanation: "Idgham Bighunnah. Tanwin kasratain (ٍ) bertemu huruf Wawu (و), dilebur disertai dengung."
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Bab 3: Idgham Bilaghunnah (إدغام بلا غنة)",
+                desc: "Memasukkan suara nun mati atau tanwin ke huruf berikutnya tanpa disertai dengung (huruf: ل, ر).",
+                questions: [
+                    {
+                        arabic: "مِنْ لَدُنْهُ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Kahf (18): 2",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ لَدُنْهُ'?",
+                        options: ["Idgham Bighunnah", "Idgham Bilaghunnah", "Izhar Halqi", "Iqlab"],
+                        correct: 1,
+                        explanation: "Idgham Bilaghunnah. Nun mati (نْ) bertemu huruf Lam (ل), dilebur tanpa dengung."
+                    },
+                    {
+                        arabic: "هُدًى لِلْمُتَّقِينَ",
+                        type: "Tanwin (ً)",
+                        source: "QS. Al-Baqarah (2): 2",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'هُدًى لِلْمُتَّقِينَ'?",
+                        options: ["Izhar Halqi", "Idgham Bilaghunnah", "Ikhfa Haqiqi", "Idgham Bighunnah"],
+                        correct: 1,
+                        explanation: "Idgham Bilaghunnah. Tanwin fathatain (ً) bertemu huruf Lam (ل), dilebur tanpa dengung."
+                    },
+                    {
+                        arabic: "مِنْ رَبِّهِمْ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Baqarah (2): 5",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ رَبِّهِمْ'?",
+                        options: ["Idgham Bighunnah", "Izhar Halqi", "Idgham Bilaghunnah", "Iqlab"],
+                        correct: 2,
+                        explanation: "Idgham Bilaghunnah. Nun mati (نْ) bertemu huruf Ra' (ر), dilebur tanpa dengung."
+                    },
+                    {
+                        arabic: "غَفُورٌ رَحِيمٌ",
+                        type: "Tanwin (ٌ)",
+                        source: "QS. Al-Baqarah (2): 173",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'غَفُورٌ رَحِيمٌ'?",
+                        options: ["Izhar Halqi", "Idgham Bilaghunnah", "Idgham Bighunnah", "Ikhfa Haqiqi"],
+                        correct: 1,
+                        explanation: "Idgham Bilaghunnah. Tanwin dhammatain (ٌ) bertemu huruf Ra' (ر), dilebur tanpa dengung."
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Bab 4: Iqlab (إقلاب)",
+                desc: "Mengganti atau membalikkan bunyi nun mati atau tanwin menjadi suara huruf mim (م) disertai dengung dan samar (huruf: ب).",
+                questions: [
+                    {
+                        arabic: "مِنْ بَعْدِ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Baqarah (2): 27",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ بَعْدِ'?",
+                        options: ["Idgham Bighunnah", "Iqlab", "Izhar Halqi", "Ikhfa Haqiqi"],
+                        correct: 1,
+                        explanation: "Iqlab. Nun mati (نْ) bertemu huruf Ba' (ب), diubah menjadi bunyi Mim (م) samar disertai dengung."
+                    },
+                    {
+                        arabic: "سَمِيعٌ بَصِيرٌ",
+                        type: "Tanwin (ٌ)",
+                        source: "QS. Al-Hajj (22): 75",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'سَمِيعٌ بَصِيرٌ'?",
+                        options: ["Izhar Halqi", "Idgham Bilaghunnah", "Iqlab", "Idgham Bighunnah"],
+                        correct: 2,
+                        explanation: "Iqlab. Tanwin dhammatain (ٌ) bertemu huruf Ba' (ب), diubah menjadi suara Mim (م) samar disertai dengung."
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Bab 5: Ikhfa Haqiqi (إخفاء حقيقي)",
+                desc: "Menyamarkan bacaan nun mati atau tanwin antara izhar dan idgham, disertai dengung (15 huruf hijaiyah).",
+                questions: [
+                    {
+                        arabic: "وَأَنْتُمْ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Baqarah (2): 22",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'وَأَنْتُمْ'?",
+                        options: ["Izhar Halqi", "Ikhfa Haqiqi", "Idgham Bighunnah", "Iqlab"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Ta' (ت), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "جَنَّاتٍ تَجْرِي",
+                        type: "Tanwin (ٍ)",
+                        source: "QS. Al-Baqarah (2): 25",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'جَنَّاتٍ تَجْرِي'?",
+                        options: ["Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bilaghunnah", "Idgham Bighunnah"],
+                        correct: 0,
+                        explanation: "Ikhfa Haqiqi. Tanwin kasratain (ٍ) bertemu huruf Ta' (ت), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "فَأَمَّا مَنْ ثَقُلَتْ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Qari'ah (101): 6",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'فَأَمَّا مَنْ ثَقُلَتْ'?",
+                        options: ["Idgham Bighunnah", "Izhar Halqi", "Ikhfa Haqiqi", "Iqlab"],
+                        correct: 2,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Sa' (ث), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "مَاءً ثَجَّاجًا",
+                        type: "Tanwin (ً)",
+                        source: "QS. An-Naba' (78): 14",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مَاءً ثَجَّاجًا'?",
+                        options: ["Ikhfa Haqiqi", "Idgham Bilaghunnah", "Izhar Halqi", "Idgham Bighunnah"],
+                        correct: 0,
+                        explanation: "Ikhfa Haqiqi. Tanwin fathatain (ً) bertemu huruf Sa' (ث), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "مَنْ جَاءَ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-An'am (6): 160",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مَنْ جَاءَ'?",
+                        options: ["Izhar Halqi", "Iqlab", "Ikhfa Haqiqi", "Idgham Bighunnah"],
+                        correct: 2,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Jim (ج), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "خَلْقٍ جَدِيدٍ",
+                        type: "Tanwin (ٍ)",
+                        source: "QS. Qaf (50): 15",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'خَلْقٍ جَدِيدٍ'?",
+                        options: ["Idgham Bilaghunnah", "Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bighunnah"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Tanwin kasratain (ٍ) bertemu huruf Jim (ج), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "أَنْدَادًا",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Baqarah (2): 22",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'أَنْدَادًا'?",
+                        options: ["Idgham Bighunnah", "Ikhfa Haqiqi", "Izhar Halqi", "Iqlab"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Dal (د), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "كَأْسًا دِهَاقًا",
+                        type: "Tanwin (ً)",
+                        source: "QS. An-Naba' (78): 34",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'كَأْسًا دِهَاقًا'?",
+                        options: ["Izhar Halqi", "Ikhfa Haqiqi", "Idgham Bilaghunnah", "Idgham Bighunnah"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Tanwin fathatain (ً) bertemu huruf Dal (د), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "مِنْ ذَهَبٍ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Kahf (18): 31",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ ذَهَبٍ'?",
+                        options: ["Iqlab", "Izhar Halqi", "Ikhfa Haqiqi", "Idgham Bighunnah"],
+                        correct: 2,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Dzal (ذ), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "يَتِيمًا ذَا مَقْرَبَةٍ",
+                        type: "Tanwin (ً)",
+                        source: "QS. Al-Balad (90): 15",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'يَتِيمًا ذَا مَقْرَبَةٍ'?",
+                        options: ["Ikhfa Haqiqi", "Idgham Bilaghunnah", "Izhar Halqi", "Idgham Bighunnah"],
+                        correct: 0,
+                        explanation: "Ikhfa Haqiqi. Tanwin fathatain (ً) bertemu huruf Dzal (ذ), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "أَنْزَلْنَا",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Qadr (97): 1",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'أَنْزَلْنَا'?",
+                        options: ["Izhar Halqi", "Ikhfa Haqiqi", "Idgham Bighunnah", "Iqlab"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Zai (ز), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "يَوْمَئِذٍ زُرْقًا",
+                        type: "Tanwin (ٍ)",
+                        source: "QS. Thaha (20): 102",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'يَوْمَئِذٍ زُرْقًا'?",
+                        options: ["Idgham Bilaghunnah", "Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bighunnah"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Tanwin kasratain (ٍ) bertemu huruf Zai (ز), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "الْإِنْسَانُ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-'Alaq (96): 6",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'الْإِنْسَانُ'?",
+                        options: ["Idgham Bighunnah", "Izhar Halqi", "Ikhfa Haqiqi", "Iqlab"],
+                        correct: 2,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Sin (س), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "قَوْلًا سَدِيدًا",
+                        type: "Tanwin (ً)",
+                        source: "QS. Al-Ahzab (33): 70",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'قَوْلًا سَدِيدًا'?",
+                        options: ["Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bilaghunnah", "Idgham Bighunnah"],
+                        correct: 0,
+                        explanation: "Ikhfa Haqiqi. Tanwin fathatain (ً) bertemu huruf Sin (س), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "مِنْ شَرِّ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Falaq (113): 2",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ شَرِّ'?",
+                        options: ["Izhar Halqi", "Iqlab", "Ikhfa Haqiqi", "Idgham Bighunnah"],
+                        correct: 2,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Syin (ش), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "عَذَابٌ شَدِيدٌ",
+                        type: "Tanwin (ٌ)",
+                        source: "QS. Ali 'Imran (3): 4",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'عَذَابٌ شَدِيدٌ'?",
+                        options: ["Idgham Bilaghunnah", "Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bighunnah"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Tanwin dhammatain (ٌ) bertemu huruf Syin (ش), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "فَانْصَبْ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Insyirah (94): 7",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'فَانْصَبْ'?",
+                        options: ["Idgham Bighunnah", "Izhar Halqi", "Ikhfa Haqiqi", "Iqlab"],
+                        correct: 2,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Shad (ص), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "رِيحٍ صَرْصَرٍ",
+                        type: "Tanwin (ٍ)",
+                        source: "QS. Al-Haqqah (69): 6",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'رِيحٍ صَرْصَرٍ'?",
+                        options: ["Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bilaghunnah", "Idgham Bighunnah"],
+                        correct: 0,
+                        explanation: "Ikhfa Haqiqi. Tanwin kasratain (ٍ) bertemu huruf Shad (ص), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "مَنْضُودٍ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Waqi'ah (56): 29",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مَنْضُودٍ'?",
+                        options: ["Izhar Halqi", "Ikhfa Haqiqi", "Idgham Bighunnah", "Iqlab"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Dhad (ض), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "قَوْمًا ضَالِّينَ",
+                        type: "Tanwin (ً)",
+                        source: "QS. Al-Ma'idah (5): 77",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'قَوْمًا ضَالِّينَ'?",
+                        options: ["Idgham Bilaghunnah", "Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bighunnah"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Tanwin fathatain (ً) bertemu huruf Dhad (ض), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "مِنْ طِينٍ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. As-Sajdah (32): 7",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ طِينٍ'?",
+                        options: ["Idgham Bighunnah", "Izhar Halqi", "Ikhfa Haqiqi", "Iqlab"],
+                        correct: 2,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Tha' (ط), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "صَعِيدًا طَيِّبًا",
+                        type: "Tanwin (ً)",
+                        source: "QS. An-Nisa (4): 43",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'صَعِيدًا طَيِّبًا'?",
+                        options: ["Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bilaghunnah", "Idgham Bighunnah"],
+                        correct: 0,
+                        explanation: "Ikhfa Haqiqi. Tanwin fathatain (ً) bertemu huruf Tha' (ط), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "يَنْظُرُونَ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Ghasyiyah (88): 17",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'يَنْظُرُونَ'?",
+                        options: ["Izhar Halqi", "Ikhfa Haqiqi", "Idgham Bighunnah", "Iqlab"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Zha' (ظ), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "ظِلًّا ظَلِيلًا",
+                        type: "Tanwin (ً)",
+                        source: "QS. An-Nisa (4): 57",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'ظِلًّا ظَلِيلًا'?",
+                        options: ["Idgham Bilaghunnah", "Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bighunnah"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Tanwin fathatain (ً) bertemu huruf Zha' (ظ), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "أَنْفُسَهُمْ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Baqarah (2): 9",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'أَنْفُسَهُمْ'?",
+                        options: ["Izhar Halqi", "Iqlab", "Ikhfa Haqiqi", "Idgham Bighunnah"],
+                        correct: 2,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Fa' (ف), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "خَالِدًا فِيهَا",
+                        type: "Tanwin (ً)",
+                        source: "QS. An-Nisa (4): 14",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'خَالِدًا فِيهَا'?",
+                        options: ["Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bilaghunnah", "Idgham Bighunnah"],
+                        correct: 0,
+                        explanation: "Ikhfa Haqiqi. Tanwin fathatain (ً) bertemu huruf Fa' (ف), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "مِنْ قَبْلِ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Baqarah (2): 25",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مِنْ قَبْلِ'?",
+                        options: ["Idgham Bighunnah", "Izhar Halqi", "Ikhfa Haqiqi", "Iqlab"],
+                        correct: 2,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Qaf (ق), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "كُتُبٌ قَيِّمَةٌ",
+                        type: "Tanwin (ٌ)",
+                        source: "QS. Al-Bayyinah (98): 3",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'كُتُبٌ قَيِّمَةٌ'?",
+                        options: ["Idgham Bilaghunnah", "Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bighunnah"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Tanwin dhammatain (ٌ) bertemu huruf Qaf (ق), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "مَنْ كَانَ",
+                        type: "Nun Mati (نْ)",
+                        source: "QS. Al-Baqarah (2): 97",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'مَنْ كَانَ'?",
+                        options: ["Izhar Halqi", "Ikhfa Haqiqi", "Idgham Bighunnah", "Iqlab"],
+                        correct: 1,
+                        explanation: "Ikhfa Haqiqi. Nun mati (نْ) bertemu huruf Kaf (ك), dibaca samar dengan dengung."
+                    },
+                    {
+                        arabic: "كِرَامًا كَاتِبِينَ",
+                        type: "Tanwin (ً)",
+                        source: "QS. Al-Infithar (82): 11",
+                        prompt: "Bagaimana hukum tajwid pada lafadz 'كِرَامًا كَاتِبِينَ'?",
+                        options: ["Ikhfa Haqiqi", "Izhar Halqi", "Idgham Bilaghunnah", "Idgham Bighunnah"],
+                        correct: 0,
+                        explanation: "Ikhfa Haqiqi. Tanwin fathatain (ً) bertemu huruf Kaf (ك), dibaca samar dengan dengung."
+                    }
+                ]
+            }
+        ];
+
+        // Application State
+        class TajwidQuizApp {
+            constructor() {
+                this.loadProgress();
+                this.currentChapterId = null;
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.correctCount = 0;
+                this.wrongCount = 0;
+                this.selectedAnswerIndex = null;
+                this.isAnswered = false;
+            }
+
+            loadProgress() {
+                const saved = localStorage.getItem('tajwid_quiz_progress');
+                if (saved) {
+                    try {
+                        this.progress = JSON.parse(saved);
+                    } catch (e) {
+                        this.progress = {};
+                    }
+                } else {
+                    this.progress = {};
+                }
+            }
+
+            saveProgress() {
+                localStorage.setItem('tajwid_quiz_progress', JSON.stringify(this.progress));
+            }
+
+            init() {
+                this.renderDashboard();
+            }
+
+            renderDashboard() {
+                // Hide all views, show dashboard
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                document.getElementById('view-quiz').classList.add('hidden');
+                document.getElementById('view-result').classList.add('hidden');
+                document.getElementById('view-global-recap').classList.add('hidden');
+                document.getElementById('header-stats').style.display = 'flex';
+                document.getElementById('stat-current-chapter').innerText = "Menu Utama";
+
+                const container = document.getElementById('chapter-list-container');
+                container.innerHTML = '';
+
+                let totalCompletedChapters = 0;
+                let totalCorrectOverall = 0;
+                let totalQuestionsOverall = 56;
+
+                chaptersData.forEach((chapter) => {
+                    const chProg = this.progress[chapter.id];
+                    const isCompleted = chProg && chProg.completed;
+                    if (isCompleted) totalCompletedChapters++;
+                    if (chProg && chProg.correct) totalCorrectOverall += chProg.correct;
+
+                    const totalQ = chapter.questions.length;
+                    const statusText = isCompleted 
+                        ? `<span class="text-emerald-400 font-semibold flex items-center gap-1">✅ Selesai (${chProg.score} Poin)</span>`
+                        : `<span class="text-amber-400/90 font-medium">Belum Dikerjakan</span>`;
+
+                    const card = document.createElement('div');
+                    card.className = `bg-emerald-900/30 border ${isCompleted ? 'border-emerald-600/50 bg-emerald-900/50' : 'border-emerald-700/30'} rounded-2xl p-5 sm:p-6 backdrop-blur transition-all hover:border-emerald-500/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg`;
+                    
+                    card.innerHTML = `
+                        <div class="space-y-1.5 flex-grow">
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-emerald-800/80 text-emerald-200 text-xs px-2.5 py-0.5 rounded-md font-medium border border-emerald-600/30">${totalQ} Soal</span>
+                                ${statusText}
+                            </div>
+                            <h3 class="text-lg font-bold text-white">${chapter.title}</h3>
+                            <p class="text-xs text-emerald-200/80 leading-relaxed">${chapter.desc}</p>
+                        </div>
+                        <div>
+                            <button onclick="app.startChapter(${chapter.id})" class="w-full sm:w-auto bg-gradient-to-r ${isCompleted ? 'from-emerald-700 to-emerald-800 hover:from-emerald-600 hover:to-emerald-700' : 'from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold'} text-white px-5 py-2.5 rounded-xl shadow transition text-sm flex items-center justify-center space-x-2">
+                                <span>${isCompleted ? 'Ulangi Kuis' : 'Mulai Kuis'}</span>
+                                <span>→</span>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+                // Update Overall Progress
+                if (totalCompletedChapters > 0) {
+                    document.getElementById('overall-progress-bar').classList.remove('hidden');
+                    const percent = Math.round((totalCompletedChapters / chaptersData.length) * 100);
+                    document.getElementById('progress-percentage').innerText = `${percent}% Selesai (${totalCompletedChapters}/5 Bab)`;
+                    document.getElementById('progress-fill').style.width = `${percent}%`;
+                } else {
+                    document.getElementById('overall-progress-bar').classList.add('hidden');
+                }
+
+                // Show global recap button if all chapters completed
+                if (totalCompletedChapters === chaptersData.length) {
+                    document.getElementById('global-recap-btn-container').classList.remove('hidden');
+                } else {
+                    document.getElementById('global-recap-btn-container').classList.add('hidden');
+                }
+            }
+
+            startChapter(chapterId) {
+                this.currentChapterId = chapterId;
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.correctCount = 0;
+                this.wrongCount = 0;
+
+                document.getElementById('view-dashboard').classList.add('hidden');
+                document.getElementById('view-quiz').classList.remove('hidden');
+                document.getElementById('view-result').classList.add('hidden');
+                document.getElementById('view-global-recap').classList.add('hidden');
+
+                const chapter = chaptersData.find(c => c.id === chapterId);
+                document.getElementById('quiz-chapter-title').innerText = chapter.title;
+                document.getElementById('stat-current-chapter').innerText = chapter.title;
+
+                this.renderQuestion();
+            }
+
+            renderQuestion() {
+                const chapter = chaptersData.find(c => c.id === this.currentChapterId);
+                const q = chapter.questions[this.currentQuestionIndex];
+
+                document.getElementById('current-question-num').innerText = this.currentQuestionIndex + 1;
+                document.getElementById('total-question-num').innerText = chapter.questions.length;
+                document.getElementById('question-type-badge').innerText = q.type;
+                document.getElementById('question-source-badge').innerText = q.source;
+                document.getElementById('question-arabic-text').innerText = q.arabic;
+                document.getElementById('question-prompt-text').innerText = q.prompt;
+
+                // Reset explanation box
+                const expBox = document.getElementById('explanation-box');
+                expBox.classList.add('hidden');
+
+                // Render Options
+                const optsContainer = document.getElementById('options-container');
+                optsContainer.innerHTML = '';
+                this.isAnswered = false;
+                this.selectedAnswerIndex = null;
+
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left p-4 rounded-2xl bg-emerald-950/60 border border-emerald-700/40 hover:bg-emerald-800/60 hover:border-emerald-500 transition-all font-medium text-emerald-100 flex items-center justify-between group shadow-sm";
+                    btn.id = `option-btn-${idx}`;
+                    btn.onclick = () => this.selectAnswer(idx);
+
+                    btn.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <span class="w-7 h-7 rounded-xl bg-emerald-900 border border-emerald-700 flex items-center justify-center text-xs font-bold text-amber-400 group-hover:bg-amber-500 group-hover:text-emerald-950 transition">${String.fromCharCode(65 + idx)}</span>
+                            <span>${opt}</span>
+                        </div>
+                        <span class="text-xs text-emerald-400 opacity-0 group-hover:opacity-100 transition">Pilih →</span>
+                    `;
+                    optsContainer.appendChild(btn);
+                });
+            }
+
+            selectAnswer(selectedIndex) {
+                if (this.isAnswered) return;
+                this.isAnswered = true;
+                this.selectedAnswerIndex = selectedIndex;
+
+                const chapter = chaptersData.find(c => c.id === this.currentChapterId);
+                const q = chapter.questions[this.currentQuestionIndex];
+                const isCorrect = (selectedIndex === q.correct);
+
+                if (isCorrect) {
+                    this.correctCount++;
+                    this.score += 10;
+                } else {
+                    this.wrongCount++;
+                }
+
+                // Highlight buttons
+                q.options.forEach((opt, idx) => {
+                    const btn = document.getElementById(`option-btn-${idx}`);
+                    btn.disabled = true;
+                    if (idx === q.correct) {
+                        btn.className = "w-full text-left p-4 rounded-2xl bg-emerald-700/80 border-2 border-emerald-400 font-semibold text-white flex items-center justify-between shadow-md";
+                        btn.innerHTML += `<span class="text-xs bg-emerald-900 text-emerald-200 px-2.5 py-1 rounded-lg">Jawaban Benar</span>`;
+                    } else if (idx === selectedIndex && !isCorrect) {
+                        btn.className = "w-full text-left p-4 rounded-2xl bg-rose-950/80 border-2 border-rose-500 font-semibold text-rose-200 flex items-center justify-between shadow-md";
+                        btn.innerHTML += `<span class="text-xs bg-rose-900 text-rose-200 px-2.5 py-1 rounded-lg">Pilihan Anda</span>`;
+                    } else {
+                        btn.className = "w-full text-left p-4 rounded-2xl bg-emerald-950/30 border border-emerald-800/30 opacity-50 font-medium text-emerald-300 flex items-center justify-between";
+                    }
+                });
+
+                // Show Explanation Box
+                const expBox = document.getElementById('explanation-box');
+                expBox.classList.remove('hidden');
+                
+                const header = document.getElementById('explanation-header');
+                const title = document.getElementById('feedback-title');
+                const text = document.getElementById('explanation-text');
+
+                if (isCorrect) {
+                    expBox.className = "mt-4 p-4 rounded-2xl border bg-emerald-950/90 border-emerald-500 shadow-xl animate-fadeIn";
+                    header.className = "flex items-center space-x-2 font-bold mb-1 text-emerald-300";
+                    document.getElementById('feedback-icon').innerText = "✅";
+                    title.innerText = "Luar Biasa, Jawaban Anda Benar!";
+                } else {
+                    expBox.className = "mt-4 p-4 rounded-2xl border bg-rose-950/90 border-rose-500 shadow-xl animate-fadeIn";
+                    header.className = "flex items-center space-x-2 font-bold mb-1 text-rose-300";
+                    document.getElementById('feedback-icon').innerText = "❌";
+                    title.innerText = "Kurang Tepat, Perhatikan Pembahasan Berikut:";
+                }
+
+                text.innerText = q.explanation;
+            }
+
+            nextQuestion() {
+                const chapter = chaptersData.find(c => c.id === this.currentChapterId);
+                this.currentQuestionIndex++;
+                if (this.currentQuestionIndex < chapter.questions.length) {
+                    this.renderQuestion();
+                } else {
+                    this.showChapterResult();
+                }
+            }
+
+            showChapterResult() {
+                document.getElementById('view-quiz').classList.add('hidden');
+                document.getElementById('view-result').classList.remove('hidden');
+
+                const chapter = chaptersData.find(c => c.id === this.currentChapterId);
+                document.getElementById('result-chapter-title').innerText = chapter.title;
+                document.getElementById('stat-score').innerText = this.score;
+                document.getElementById('stat-correct').innerText = this.correctCount;
+                document.getElementById('stat-wrong').innerText = this.wrongCount;
+
+                // Save progress
+                this.progress[chapter.id] = {
+                    completed: true,
+                    score: this.score,
+                    correct: this.correctCount,
+                    wrong: this.wrongCount,
+                    total: chapter.questions.length
+                };
+                this.saveProgress();
+
+                // Configure next chapter button
+                const nextBtn = document.getElementById('btn-next-chapter');
+                if (chapter.id < chaptersData.length) {
+                    nextBtn.innerText = "Lanjut ke Bab Berikutnya →";
+                    nextBtn.onclick = () => this.startChapter(chapter.id + 1);
+                } else {
+                    nextBtn.innerText = "🏆 Lihat Rekapitulasi Akhir";
+                    nextBtn.onclick = () => this.showGlobalRecap();
+                }
+            }
+
+            retryChapter() {
+                this.startChapter(this.currentChapterId);
+            }
+
+            nextChapterOrDashboard() {
+                if (this.currentChapterId < chaptersData.length) {
+                    this.startChapter(this.currentChapterId + 1);
+                } else {
+                    this.showGlobalRecap();
+                }
+            }
+
+            showGlobalRecap() {
+                document.getElementById('view-dashboard').classList.add('hidden');
+                document.getElementById('view-quiz').classList.add('hidden');
+                document.getElementById('view-result').classList.add('hidden');
+                document.getElementById('view-global-recap').classList.remove('hidden');
+                document.getElementById('stat-current-chapter').innerText = "Rekapitulasi";
+
+                let totalCorrect = 0;
+                let totalQuestions = 56;
+                let breakdownContainer = document.getElementById('global-chapter-breakdown');
+                breakdownContainer.innerHTML = '';
+
+                chaptersData.forEach(chapter => {
+                    const prog = this.progress[chapter.id];
+                    const correct = prog ? prog.correct : 0;
+                    const total = chapter.questions.length;
+                    totalCorrect += correct;
+
+                    const item = document.createElement('div');
+                    item.className = "bg-emerald-950/60 border border-emerald-700/30 p-4 rounded-xl flex items-center justify-between";
+                    item.innerHTML = `
+                        <div>
+                            <h4 class="font-bold text-sm text-white">${chapter.title}</h4>
+                            <p class="text-xs text-emerald-300">Benar: ${correct} dari ${total} soal</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-amber-400 font-bold">${Math.round((correct/total)*100)}%</span>
+                        </div>
+                    `;
+                    breakdownContainer.appendChild(item);
+                });
+
+                document.getElementById('global-final-score').innerText = `${totalCorrect} / ${totalQuestions}`;
+                const overallPercent = Math.round((totalCorrect / totalQuestions) * 100);
+                document.getElementById('global-score-percentage').innerText = `Persentase Keseluruhan: ${overallPercent}%`;
+            }
+
+            resetAllProgress() {
+                if (confirm("Apakah Anda yakin ingin mereset seluruh progress kuis?")) {
+                    localStorage.removeItem('tajwid_quiz_progress');
+                    this.loadProgress();
+                    this.renderDashboard();
+                }
+            }
+
+            returnToDashboard() {
+                this.renderDashboard();
+            }
+        }
+
+        // Initialize App on window load
+        const app = new TajwidQuizApp();
+        window.onload = function() {
+            app.init();
+        };
+    </script>
+</body>
+</html>
+```
